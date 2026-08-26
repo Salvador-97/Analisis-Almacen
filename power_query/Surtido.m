@@ -163,8 +163,14 @@ let
             {"Dia Semana", each Text.Proper(_)}
         }
     ),
-    datosCompletos = Table.AddColumn(
+    minusculasSurtidor = Table.TransformColumns(
         mayusculasDia,
+        {
+            {"Surtidor", each Text.Proper(_)}
+        }
+    ),
+    datosCompletos = Table.AddColumn(
+        minusculasSurtidor,
         "Datos Completos",
         each 
             if [Folio Surtido] <> null and [Hora Asignada] <> null
@@ -193,6 +199,42 @@ let
             if [#"Tiempo Proceso (min)"] <= 120 then "Largo" 
             else "Muy Largo",
             type text
+    ),
+    validarTiempo = Table.AddColumn(
+        categoriaTiempo,
+        "Validación Tiempo",
+        each
+            if [Hora Fin] = null or [Hora Asignada] = null then "Sin Registro" else
+            if [#"Tiempo Proceso (min)"] < 0 then "Revisar" 
+            else "Correcto",
+            type text
+    ),
+    filtrarFecha = Table.SelectRows(
+        validarTiempo,
+        each [Fecha] <> null
+    ),
+    agrupacionFecha = Table.Group(
+        filtrarFecha,
+        {"Fecha"},
+        {
+            {"Folios", each Table.RowCount(_), type number},
+            {"Total Cajas", each List.Sum([Total Cajas]), type number},
+            {"Cajas Surtidas", each List.Sum([Cajas Surtidas]), type number},
+            {"Tiempo Promedio (min)", each List.Average([#"Tiempo Proceso (min)"]), type number}
+        }
+    ),
+    limpiarSurtidores = Table.SelectRows(
+        validarTiempo,
+        each [Surtidor] <> null
+    ),
+    agruparSurtidor = Table.Group(
+        limpiarSurtidores,
+        {"Surtidor"},
+        {
+            {"Folios Realizados", each Table.RowCount(_), type number},
+            {"Total Cajas", each List.Sum([Total Cajas])},
+            {"Tiempo Promedio (min)", each Number.Round(List.Average([#"Tiempo Proceso (min)"]), 2)}
+        }
     )
 in
-    categoriaTiempo
+    agruparSurtidor
