@@ -232,9 +232,29 @@ let
         {"Surtidor"},
         {
             {"Folios Realizados", each Table.RowCount(_), type number},
+            {"Cajas Surtidas", each List.Sum([Cajas Surtidas])},
             {"Total Cajas", each List.Sum([Total Cajas])},
-            {"Tiempo Promedio (min)", each Number.Round(List.Average([#"Tiempo Proceso (min)"]), 2)}
+            {"Tiempo Promedio (min)", each Number.Round(List.Average([#"Tiempo Proceso (min)"]), 2), Int64.Type},
+            {"Tiempo Total", each List.Sum([#"Tiempo Proceso (min)"]), Int64.Type}
         }
+    ),
+    porcentajeSurtidorCajas = Table.AddColumn(
+    agruparSurtidor,
+    "% Cajas Surtidas",
+    each
+        if [Total Cajas] <> 0
+        then Number.Round([#"Cajas Surtidas"] / [#"Total Cajas"], 2)
+        else null,
+    type number
+    ),
+    promedioPorFolio = Table.AddColumn(
+        porcentajeSurtidorCajas,
+        "Cajas/Folio",
+        each
+            if [Folios Realizados] <> 0
+            then Number.Round([Total Cajas] / [Folios Realizados], 2)
+            else null,
+            type number
     )
 in
-    agruparSurtidor
+    promedioPorFolio
