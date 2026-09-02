@@ -157,8 +157,14 @@ let
             {"Surtidor", each Text.Proper(_)}
         }
     ),
-    datosCompletos = Table.AddColumn(
+    limpiarSurtidores = Table.TransformColumns(
         minusculasSurtidor,
+        {
+            {"Surtidor", each if _ <> null then _ else "Otro"}
+        }
+    ),
+    datosCompletos = Table.AddColumn(
+        limpiarSurtidores,
         "Datos Completos",
         each 
             if [Folio Surtido] <> null and [Hora Asignada] <> null
