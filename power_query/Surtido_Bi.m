@@ -163,8 +163,12 @@ let
             {"Surtidor", each if _ <> null then _ else "Otro"}
         }
     ),
-    datosCompletos = Table.AddColumn(
+    limpiarOtros = Table.SelectRows(
         limpiarSurtidores,
+        each [Surtidor] <> "Otro"
+    ),
+    datosCompletos = Table.AddColumn(
+        limpiarOtros,
         "Datos Completos",
         each 
             if [Folio Surtido] <> null and [Hora Asignada] <> null
