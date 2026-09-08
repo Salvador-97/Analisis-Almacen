@@ -157,6 +157,7 @@ let
             {"Surtidor", each Text.Proper(_)}
         }
     ),
+    /*
     limpiarSurtidores = Table.TransformColumns(
         minusculasSurtidor,
         {
@@ -166,9 +167,13 @@ let
     limpiarOtros = Table.SelectRows(
         limpiarSurtidores,
         each [Surtidor] <> "Otro"
+    ),*/
+    rellenarOBC = Table.FillDown(
+        minusculasSurtidor,
+        {"Folio Surtido"}
     ),
     datosCompletos = Table.AddColumn(
-        limpiarOtros,
+        minusculasSurtidor,
         "Datos Completos",
         each 
             if [Folio Surtido] <> null and [Hora Asignada] <> null
