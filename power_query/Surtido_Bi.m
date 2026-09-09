@@ -172,8 +172,13 @@ let
         minusculasSurtidor,
         {"Folio Surtido"}
     ),
+    rellenarFechaInicio = Table.FillDown(
+        rellenarOBC,
+        {"Hora Asignada"}
+    ),
+    /*
     datosCompletos = Table.AddColumn(
-        minusculasSurtidor,
+        rellenarOBC,
         "Datos Completos",
         each 
             if [Folio Surtido] <> null and [Hora Asignada] <> null
@@ -212,16 +217,24 @@ let
             else "Correcto",
             type text
     ),
-    filtrarFecha = Table.SelectRows(
-        validarTiempo,
-        each [Fecha] <> null
-    ),
+    */
     filtrarFilas = Table.SelectRows(
-        filtrarFecha,
+        rellenarFechaInicio,
         each
+            [Fecha] <> null and
             [Folio Surtido] <> null and
             [Hora Asignada] <> null and
-            [Hora Fin] <> null
+            [Hora Fin] <> null and
+            [Surtidor] <> null
+    ),
+    crearLlave = Table.AddColumn(
+        filtrarFilas,
+        "Llave",
+        each
+            Text.Combine(
+                {[Folio Surtido], [Surtidor]},
+                "|"
+            )
     )
 in
-    filtrarFilas
+    crearLlave

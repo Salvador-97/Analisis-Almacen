@@ -67,6 +67,15 @@ let
             {"Error", each Text.Proper(_)},
             {"Responsable Inventarios", each Text.Proper(_)}
         }
+    ),
+    crearLlave = Table.AddColumn(
+        minusculas,
+        "Llave",
+        each
+            Text.Combine(
+                {[OBC], [Surtidor]},
+                "|"
+            )
     )
 in
-    minusculas
+    crearLlave
