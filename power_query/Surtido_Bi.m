@@ -157,17 +157,6 @@ let
             {"Surtidor", each Text.Proper(_)}
         }
     ),
-    /*
-    limpiarSurtidores = Table.TransformColumns(
-        minusculasSurtidor,
-        {
-            {"Surtidor", each if _ <> null then _ else "Otro"}
-        }
-    ),
-    limpiarOtros = Table.SelectRows(
-        limpiarSurtidores,
-        each [Surtidor] <> "Otro"
-    ),*/
     rellenarOBC = Table.FillDown(
         minusculasSurtidor,
         {"Folio Surtido"}
@@ -176,48 +165,6 @@ let
         rellenarOBC,
         {"Hora Asignada"}
     ),
-    /*
-    datosCompletos = Table.AddColumn(
-        rellenarOBC,
-        "Datos Completos",
-        each 
-            if [Folio Surtido] <> null and [Hora Asignada] <> null
-                and [Surtidor] <> null and [Validador] <> null
-            then "Completo" 
-            else "Incompleto",
-            type text
-    ),
-    categoriaCajas = Table.AddColumn(
-        datosCompletos,
-        "Categoría Cajas",
-        each
-            if [Total Cajas] = 0 then "Sin cajas" else
-            if [Total Cajas] <= 20 then "Pequeño" else
-            if [Total Cajas] <= 50 then "Mediano" else
-            if [Total Cajas] <= 100 then "Grande" 
-            else "Muy Grande",
-            type text
-    ),
-    categoriaTiempo = Table.AddColumn(
-        categoriaCajas,
-        "Categoría Tiempo",
-        each
-            if [#"Tiempo Proceso (min)"] <= 30 then "Rápido" else
-            if [#"Tiempo Proceso (min)"] <= 60 then "Normal" else
-            if [#"Tiempo Proceso (min)"] <= 120 then "Largo" 
-            else "Muy Largo",
-            type text
-    ),
-    validarTiempo = Table.AddColumn(
-        categoriaTiempo,
-        "Validación Tiempo",
-        each
-            if [Hora Fin] = null or [Hora Asignada] = null then "Sin Registro" else
-            if [#"Tiempo Proceso (min)"] < 0 then "Revisar" 
-            else "Correcto",
-            type text
-    ),
-    */
     filtrarFilas = Table.SelectRows(
         rellenarFechaInicio,
         each
@@ -235,6 +182,12 @@ let
                 {[Folio Surtido], [Surtidor]},
                 "|"
             )
+    ),
+    fechaLlave = Table.AddColumn(
+        crearLlave,
+        "Fecha Surtido",
+        each DateTime.Date([Fecha]),
+        type date
     )
 in
-    crearLlave
+    fechaLlave

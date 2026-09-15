@@ -76,6 +76,11 @@ let
                 {[OBC], [Surtidor]},
                 "|"
             )
+    ),
+    fechaLlave = Table.AddColumn(
+        crearLlave,
+        "Fecha Surtido",
+        each DateTime.Date([Fecha])
     )
 in
-    crearLlave
+    fechaLlave
