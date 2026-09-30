@@ -80,7 +80,8 @@ let
     fechaLlave = Table.AddColumn(
         crearLlave,
         "Fecha Surtido",
-        each DateTime.Date([Fecha])
+        each DateTime.Date([Fecha]),
+        type date
     )
 in
     fechaLlave
