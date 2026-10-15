@@ -52,6 +52,11 @@ let
     ordenarUbicaciones = Table.Sort(
         seleccionarColumnas,
         {"UbicacionID", Order.Ascending}
+    ),
+    seleccionarFilas = Table.SelectRows(
+        ordenarUbicaciones,
+        each [UbicacionID] <> null and
+            [UbicacionID] <> ""
     )
 in
-    ordenarUbicaciones
+    seleccionarFilas
