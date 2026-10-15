@@ -1,0 +1,31 @@
+Cajas = 
+    IF(
+        COUNTROWS(BaseDatosWMS) > 0, 
+        COUNTROWS(BaseDatosWMS), 0
+    )
+
+Bloqueada = 
+    IF(
+        COUNTROWS(Bloqueadas) > 0,
+        "Sí",
+        "No"
+    )
+
+EstadoUbicaciones = 
+    IF(
+        COUNTROWS(Bloqueadas) > 0,
+        "Bloqueada",
+        IF(
+            COUNTROWS(BaseDatosWMS) > 0,
+            "Ocupada",
+            "Vacía"
+        )
+    )
+
+TotalOcupadas = 
+    COUNTROWS(
+        FILTER(
+            Ubicaciones,
+            [EstadoUbicaciones] = "Ocupada"
+        )
+    )
