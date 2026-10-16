@@ -29,3 +29,19 @@ TotalOcupadas =
             [EstadoUbicaciones] = "Ocupada"
         )
     )
+TotalBloqueadas = 
+    COUNTROWS(
+        FILTER(
+            Ubicaciones,
+            [EstadoUbicaciones] = "Bloqueada"
+        )
+    )
+TotalVacias = 
+    COUNTROWS(
+        FILTER(
+            Ubicaciones,
+            [EstadoUbicaciones] = "Vacía"
+        )
+    )
+TotalUbicaciones =
+    COUNTROWS(Ubicaciones)
