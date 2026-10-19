@@ -1,23 +1,33 @@
 let
-    Origen = Excel.Workbook(Web.Contents("https://docs.google.com/spreadsheets/d/1BG8o3_2Y2RRZWYP1pz0q0KG71cBrtmCh3TlYhUs6s9w/export?format=xlsx"), null, true),
-    #"Hoja 1_Sheet" = Origen{[Item="Hoja 1",Kind="Sheet"]}[Data],
+    Origen = GoogleSheets.Contents("https://docs.google.com/spreadsheets/d/1DzL_3cPeIvWSiLv1B7R9iVsKRGa8Mdvg9BrlVrHj66c/export?format=xlsx"),
+    #"Navegación" = Origen{[name = "General 总汇表", ItemKind = "Table"]}[Data],
     #"Encabezados promovidos" = Table.PromoteHeaders(
-        #"Hoja 1_Sheet",
+        #"Navegación",
         [PromoteAllScalars=true]
     ),
-    #"Tipo cambiado" = Table.TransformColumnTypes(
+
+    filtrarFilas = Table.SelectRows(
         #"Encabezados promovidos",
+        each
+            [FECHA] <> null and
+            [FOLIO SURTIDO] <> null and
+            [FOLIO SURTIDO] <> "" and
+            [SURTIDOR] <> null
+    ),
+    
+    #"Tipo cambiado" = Table.TransformColumnTypes(
+        filtrarFilas,
         {
             {"FECHA", type date},
             {"FOLIO SURTIDO", type text},
             {"CLIENTE", type text},
             {"HORA ASIGNADA", type time},
             {"CHECK #(lf)LIST", type logical},
-            {"HORA FIN#(lf) VALIDACION", type time},
+            {"HORA FIN#(lf)VALIDACION", type time},
             {"Recipient/收件人", type text},
             {"DESTINO", type text},
             {"FECHACITA", type date},
-            {"TOTALCAJAS", Int64.Type},
+            {" ", Int64.Type},
             {"CAJASSURTIDAS", Int64.Type},
             {"%AVANCE", Int64.Type}, 
             {"MNE", Int64.Type},
@@ -27,22 +37,23 @@ let
             {"OBSERVACIONES", type any},
             {"RESPUESTA INVENTARIOS", type any},
             {"COMENTARIOS", type any}
-        }
+        },
+        "es-MX"
     ),
     /*Cambio de nombre a columnas*/
     cambioNombre = Table.RenameColumns(
         #"Tipo cambiado",
         {
             {"FECHA", "Fecha"},
-            {"FOLIO SURTIDO", "Folio Surtido"},
+            {"FOLIO SURTIDO", "Folio"},
             {"CLIENTE", "Cliente"},
             {"HORA ASIGNADA", "Hora Asignada"},
             {"CHECK #(lf)LIST", "Check List"},
-            {"HORA FIN#(lf) VALIDACION", "Hora Fin"},
+            {"HORA FIN#(lf)VALIDACION", "Hora Fin"},
             {"Recipient/收件人", "Receptor"},
             {"DESTINO", "Destino"},
             {"FECHACITA", "Fecha Cita"},
-            {"TOTALCAJAS", "Total Cajas"},
+            {" ", "Total Cajas"},
             {"CAJASSURTIDAS", "Cajas Surtidas"},
             {"%AVANCE", "% Avance"},
             {"MNE", "MNE"},
@@ -59,10 +70,10 @@ let
         cambioNombre,
         {
             "Fecha",
-            "Folio Surtido",
-            "Hora Asignada",
+            "Folio",
+            //"Hora Asignada",
             "Check List",
-            "Hora Fin",
+            //"Hora Fin",
             "Destino",
             "Fecha Cita",
             "Total Cajas",
@@ -105,43 +116,8 @@ let
         Replacer.ReplaceValue,
         {"Comentarios"}
     ),
-    totalCajasSurtidas = Table.AddColumn(
-        sinComentarios,
-        "Estado Cajas",
-        each
-            if [Cajas Surtidas] > [Total Cajas]
-            then "Error"
-            else "Correcto",
-        type text
-    ),
-    estadoSurtido = Table.AddColumn(
-        totalCajasSurtidas,
-        "Estado Surtido",
-        each
-            if [Cajas Surtidas] = [Total Cajas]
-            then "Completo"
-            else "Pendiente"
-    ),
-    avanceSurtido = Table.AddColumn(
-        estadoSurtido,
-        "Categoria Avance",
-        each
-            if [#"% Avance"] = 0 then "Sin iniciar" else
-            if [#"% Avance"] > 0.1 and [#"% Avance"] < 0.49 then "Bajo" else
-            if [#"% Avance"] > 0.5 and [#"% Avance"] < 0.79 then "Medio" else
-            if [#"% Avance"] > 0.8 and [#"% Avance"] < 0.99 then "Alto"
-            else "Completo",
-        type text
-    ),
-    horaMinutos = Table.AddColumn(
-        avanceSurtido,
-        "Tiempo Proceso (min)",
-        each 
-            ((Time.Hour([Hora Fin]) * 60) + (Time.Minute([Hora Fin]))) -
-            ((Time.Hour([Hora Asignada]) * 60) + (Time.Minute([Hora Asignada])))
-    ),
     nombreDia = Table.AddColumn(
-        horaMinutos,
+        sinComentarios,
         "Dia Semana",
         each Date.DayOfWeekName([Fecha], "es-MX")
     ),
@@ -159,35 +135,31 @@ let
     ),
     rellenarOBC = Table.FillDown(
         minusculasSurtidor,
-        {"Folio Surtido"}
+        {"Folio"}
     ),
+    /*
     rellenarFechaInicio = Table.FillDown(
         rellenarOBC,
         {"Hora Asignada"}
     ),
-    filtrarFilas = Table.SelectRows(
-        rellenarFechaInicio,
-        each
-            [Fecha] <> null and
-            [Folio Surtido] <> null and
-            [Hora Asignada] <> null and
-            [Hora Fin] <> null and
-            [Surtidor] <> null
-    ),
+    */
+    
     crearLlave = Table.AddColumn(
-        filtrarFilas,
+        rellenarOBC,
         "Llave",
         each
             Text.Combine(
-                {[Folio Surtido], [Surtidor]},
+                {[Folio], [Surtidor]},
                 "|"
             )
-    ),
+    )
+    /*
     fechaLlave = Table.AddColumn(
         crearLlave,
         "Fecha Surtido",
         each DateTime.Date([Fecha]),
         type date
     )
+    */
 in
-    fechaLlave
+    crearLlave

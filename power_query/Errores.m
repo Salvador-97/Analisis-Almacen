@@ -1,13 +1,8 @@
 let
-    Origen = Excel.Workbook(
-        Web.Contents("https://docs.google.com/spreadsheets/d/1wEPcXXEF7x9I-Q9TV7Fku5qA1Cu4yMCWRyDqe_DADdA/export?format=xlsx"), 
-        null, 
-        true),
-    #"JULIO-AGOSTO_Sheet" = Origen{
-            [Item="JULIO-AGOSTO",Kind="Sheet"]
-        }
-        [Data],
-    #"Encabezados promovidos" = Table.PromoteHeaders(#"JULIO-AGOSTO_Sheet", [PromoteAllScalars=true]),
+    Origen = GoogleSheets.Contents("https://docs.google.com/spreadsheets/d/1Jy2OWyOz6T2UtU6wmdeoj74oilzqPQpxioq3Uzoj5yw/export?format=xlsx"),
+  #"Navegación 1" = Origen{[name = "JULIO-SEPTIEMBRE", ItemKind = "Table"]}[Data],
+
+    #"Encabezados promovidos" = Table.PromoteHeaders(#"Navegación 1", [PromoteAllScalars=true]),
     #"Tipo cambiado" = Table.TransformColumnTypes(
         #"Encabezados promovidos",
         {
@@ -44,8 +39,24 @@ let
             "Responsable Inventarios"
         }
     ),
-    filas = Table.SelectRows(
+
+    nulosOBC = Table.ReplaceValue(
         columnas,
+        "",
+        null,
+        Replacer.ReplaceValue,
+        {"OBC"}
+    ),
+    rellenarOBC = Table.FillDown(
+        nulosOBC,
+        {"OBC"}
+    ),
+    rellenarFecha = Table.FillDown(
+        rellenarOBC,
+        {"Fecha"}
+    ),
+    filas = Table.SelectRows(
+        rellenarFecha,
         each [OBC] <> null
     ),
     limpiarEspacios = Table.TransformColumns(
@@ -76,12 +87,14 @@ let
                 {[OBC], [Surtidor]},
                 "|"
             )
-    ),
+    )
+    /*
     fechaLlave = Table.AddColumn(
         crearLlave,
         "Fecha Surtido",
         each DateTime.Date([Fecha]),
         type date
     )
+    */
 in
-    fechaLlave
+    crearLlave
