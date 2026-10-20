@@ -6,6 +6,11 @@ let
         [PromoteAllScalars=true]
     ),
 
+    rellenarOBC = Table.FillDown(
+        minusculasSurtidor,
+        {"FOLIO SURTIDO"}
+    ),
+    
     filtrarFilas = Table.SelectRows(
         #"Encabezados promovidos",
         each
@@ -133,10 +138,6 @@ let
             {"Surtidor", each Text.Proper(_)}
         }
     ),
-    rellenarOBC = Table.FillDown(
-        minusculasSurtidor,
-        {"Folio"}
-    ),
     /*
     rellenarFechaInicio = Table.FillDown(
         rellenarOBC,
@@ -145,7 +146,7 @@ let
     */
     
     crearLlave = Table.AddColumn(
-        rellenarOBC,
+        minusculasSurtidor,
         "Llave",
         each
             Text.Combine(
