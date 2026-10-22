@@ -17,7 +17,8 @@ let
             [FECHA] <> null and
             [FOLIO SURTIDO] <> null and
             [FOLIO SURTIDO] <> "" and
-            [SURTIDOR] <> null
+            [SURTIDOR] <> null and
+            [SURTIDOR] <> ""
     ),
     
     #"Tipo cambiado" = Table.TransformColumnTypes(

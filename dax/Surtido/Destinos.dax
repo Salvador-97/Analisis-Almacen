@@ -1,0 +1,39 @@
+ML5 = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "ML5"
+        )
+    )
+
+ML3 = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "ML3"
+        )
+    )
+
+PD = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "PRODUCCION D"
+        )
+    )
+
+Particular = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "PARTICULAR"
+        )
+    )
+
+PD = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "PRODUCCION D"
+        )
+    )

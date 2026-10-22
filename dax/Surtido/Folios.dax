@@ -1,0 +1,15 @@
+FoliosUnaCaja = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Total Cajas] = 1
+        )
+    )
+
+Folios10Cajas = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Total Cajas] > 1 && [Total Cajas] < 11
+        )
+    )
