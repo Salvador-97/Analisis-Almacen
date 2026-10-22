@@ -30,10 +30,34 @@ Particular =
         )
     )
 
-PD = 
+MEX6 = 
     COUNTROWS(
         FILTER(
             Surtido,
-            [Destino] = "PRODUCCION D"
+            [Destino] = "MEX6"
+        )
+    )
+
+MEX3 = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "MEX3"
+        )
+    )
+
+E.Especial = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "Etiquetado Especial"
+        )
+    )
+
+PICKUP =
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Destino] = "PICKUP"
         )
     )

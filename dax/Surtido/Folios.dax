@@ -13,3 +13,19 @@ Folios10Cajas =
             [Total Cajas] > 1 && [Total Cajas] < 11
         )
     )
+
+Folios100Cajas =
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Total Cajas] > 10 && [Total Cajas] < 100
+        )
+    )
+
+FoliosGrandes = 
+    COUNTROWS(
+        FILTER(
+            Surtido,
+            [Total Cajas] > 100
+        )
+    )
