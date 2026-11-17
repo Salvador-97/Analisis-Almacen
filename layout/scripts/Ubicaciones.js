@@ -24,6 +24,7 @@ layout.addEventListener("click", event => {
                 cuadro.classList.add("seleccionado")
             }
         }
+        console.log(ubicacionSeleccionada)
     } else {
         console.log("Elemento no valido")
     }
